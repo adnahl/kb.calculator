@@ -28,7 +28,7 @@ the `wl-clipboard` package.
 ## Keyboard shortcut
 
 To open the calculator with **SUPER + ALT + C**, add this binding to
-`sudo nvim ~/.config/hypr/bindings.lua`:
+`~/.config/hypr/bindings.lua`:
 
 ```lua
 o.bind("SUPER + ALT + C", "Calculator", "omarchy-shell shell toggle kb.calculator")
