@@ -8,6 +8,23 @@ Calculator bar widget or run:
 omarchy-shell shell toggle kb.calculator
 ```
 
+## Installation and removal
+
+Install and enable the plugin with:
+
+```sh
+omarchy plugin add https://github.com/adnahl/kb.calculator.git --enable
+```
+
+Remove it with:
+
+```sh
+omarchy plugin remove kb.calculator
+```
+
+The plugin requires the Omarchy shell. Clipboard actions use `wl-copy` from
+the `wl-clipboard` package.
+
 ## Keyboard shortcut
 
 To open the calculator with **SUPER + ALT + C**, add this binding to
@@ -115,3 +132,7 @@ Run the model regression tests:
 ```sh
 node test/calc-model.test.js
 ```
+
+## License
+
+This plugin is licensed under the [MIT License](LICENSE).
