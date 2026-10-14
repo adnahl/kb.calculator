@@ -1,0 +1,22 @@
+{
+	"schemaVersion": 1,
+	"id": "kb.calculator",
+	"name": "Calculator",
+	"version": "1.3.0",
+	"author": "aahl",
+	"license": "MIT",
+	"description": "Keyboard-first calculator with exact base conversion, unit conversion, and date calculations",
+	"kinds": ["overlay", "bar-widget"],
+	"keepLoaded": true,
+	"entryPoints": {
+		"overlay": "Calculator.qml",
+		"barWidget": "BarWidget.qml"
+	},
+	"barWidget": {
+		"displayName": "Calculator",
+		"description": "Opens the calculator, converters, and date calculator",
+		"category": "Utilities",
+		"allowMultiple": false,
+		"defaultSection": "center"
+	}
+}
