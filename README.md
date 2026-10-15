@@ -25,6 +25,24 @@ omarchy plugin remove kb.calculator
 The plugin requires the Omarchy shell. Clipboard actions use `wl-copy` from
 the `wl-clipboard` package.
 
+## Screenshots
+
+### Calculator
+
+![Calculator showing a live arithmetic result](assets/calculator.png)
+
+### Base converter
+
+![Base converter showing decimal, hexadecimal, and binary results](assets/base_converter.png)
+
+### Unit converter
+
+![Unit converter showing a Celsius-to-Fahrenheit conversion](assets/unit_converter.png)
+
+### Date calculator
+
+![Date calculator showing the elapsed days between two dates](assets/date_calculator.png)
+
 ## Keyboard shortcut
 
 To open the calculator with **SUPER + ALT + C**, add this binding to
