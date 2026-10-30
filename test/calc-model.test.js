@@ -78,6 +78,12 @@ const evaluations = [
 	["π", "3.14159265358979"],
 	["e", "2.71828182845905"],
 	["round(1; 2) + 1", "2"],
+	["log(1000)", "3"],
+	["log(100)", "2"],
+	["log(0.001)", "-3"],
+	["ln(e)", "1"],
+	["log(-1)", null],
+	["ln(0)", null],
 
 	// Typed sugar
 	["2 x 3", "6"],
@@ -111,6 +117,41 @@ const evaluations = [
 	["$5", null],
 ].forEach(([input, expected]) =>
 	check(`evaluate(${JSON.stringify(input)})`, model.evaluate(input), expected),
+);
+
+// Trigonometric functions take the angle mode as evaluate()'s second argument.
+const trigonometry = [
+	// Degrees
+	["sin(30)", "deg", "0.5"],
+	["cos(60)", "deg", "0.5"],
+	["tan(45)", "deg", "1"],
+	["sec(60)", "deg", "2"],
+	["csc(30)", "deg", "2"],
+	["cot(45)", "deg", "1"],
+	["sin(90)", "deg", "1"],
+	["2sin(30)", "deg", "1"],
+	["sin(30)cos(60)", "deg", "0.25"],
+	// Poles have no finite result
+	["tan(90)", "deg", null],
+	["sec(90)", "deg", null],
+	["csc(180)", "deg", null],
+	["cot(0)", "deg", null],
+	// Radians
+	["sin(pi / 2)", "rad", "1"],
+	["cos(0)", "rad", "1"],
+	["tan(pi / 4)", "rad", "1"],
+	["sec(0)", "rad", "1"],
+	["csc(pi / 2)", "rad", "1"],
+	["cot(pi / 4)", "rad", "1"],
+	// Degrees are the default mode
+	["sin(90)", undefined, "1"],
+	["cos(60)", undefined, "0.5"],
+].forEach(([input, mode, expected]) =>
+	check(
+		`evaluate(${JSON.stringify(input)}, ${JSON.stringify(mode)})`,
+		model.evaluate(input, mode),
+		expected,
+	),
 );
 
 // prettify() rewrites what the field shows and keeps the cursor on the same
