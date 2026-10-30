@@ -22,6 +22,7 @@ Item {
   property int sourceBase: 10
   readonly property string baseName: sourceBase === 16 ? "Hexadecimal" : sourceBase === 2 ? "Binary" : "Decimal"
   property string expression: ""
+  property string angleMode: "deg"
   readonly property var conversion: CalcModel.convertInteger(root.expression, root.sourceBase)
   property string unitCategory: "length"
   property string fromUnit: "m"
@@ -30,7 +31,7 @@ Item {
   readonly property string unitCategoryLabel: CalcModel.unitCategoryLabel(root.unitCategory)
   readonly property var unitConversion: CalcModel.convertUnit(root.expression, root.unitCategory, root.fromUnit, root.toUnit)
   readonly property var dateCalculation: CalcModel.calculateDate(root.dateCalculationMode, root.firstDate, root.secondDate)
-  readonly property string result: root.dateCalculatorMode ? root.dateCalculation.value : root.unitConverterMode ? root.unitConversion.value : root.converterMode ? root.conversion.decimal : CalcModel.evaluate(root.expression) || ""
+  readonly property string result: root.dateCalculatorMode ? root.dateCalculation.value : root.unitConverterMode ? root.unitConversion.value : root.converterMode ? root.conversion.decimal : CalcModel.evaluate(root.expression, root.angleMode) || ""
 
   readonly property string fontFamily: Style.font.menuFamily
   readonly property int cornerRadius: Style.cornerRadius
@@ -672,15 +673,87 @@ Item {
             font.pixelSize: root.typeSize
           }
 
-          Text {
+          Item {
             width: parent.width
+            height: Math.max(expressionLabel.implicitHeight, angleModeToggle.height)
             visible: !root.dateCalculatorMode
-            text: root.unitConverterMode ? root.unitCategoryLabel + " value" : root.converterMode ? root.baseName + " integer" : "Expression"
-            textFormat: Text.PlainText
-            color: root.foreground
-            opacity: 0.65
-            font.family: root.fontFamily
-            font.pixelSize: root.typeSize
+
+            Text {
+              id: expressionLabel
+              anchors.left: parent.left
+              anchors.verticalCenter: parent.verticalCenter
+              text: root.unitConverterMode ? root.unitCategoryLabel + " value" : root.converterMode ? root.baseName + " integer" : "Expression"
+              textFormat: Text.PlainText
+              color: root.foreground
+              opacity: 0.65
+              font.family: root.fontFamily
+              font.pixelSize: root.typeSize
+            }
+
+            Rectangle {
+              id: angleModeToggle
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              visible: !root.converterMode && !root.unitConverterMode
+              width: angleModeRow.implicitWidth + Style.spacing.sm * 2
+              height: Math.max(expressionLabel.implicitHeight, degModeButton.implicitHeight)
+              radius: root.cornerRadius
+              color: Color.menu.selectedBackground
+
+              Row {
+                id: angleModeRow
+                anchors.centerIn: parent
+                spacing: Style.spacing.xs
+
+                Button {
+                  id: degModeButton
+                  text: "Deg"
+                  fontFamily: root.fontFamily
+                  fontSize: Math.round(root.typeSize * 0.9)
+                  horizontalPadding: Math.round(Style.spacing.controlPaddingX * 0.6)
+                  verticalPadding: 0
+                  foreground: root.foreground
+                  selected: root.angleMode === "deg"
+                  focusable: true
+                  tooltipText: "Interpret trigonometric arguments in degrees"
+                  Accessible.name: "Degrees"
+                  onClicked: {
+                    root.angleMode = "deg"
+                    root.status = ""
+                    input.forceActiveFocus()
+                  }
+                }
+
+                Text {
+                  anchors.verticalCenter: parent.verticalCenter
+                  text: "|"
+                  textFormat: Text.PlainText
+                  color: root.foreground
+                  opacity: 0.4
+                  font.family: root.fontFamily
+                  font.pixelSize: Math.round(root.typeSize * 0.9)
+                }
+
+                Button {
+                  id: radModeButton
+                  text: "Rad"
+                  fontFamily: root.fontFamily
+                  fontSize: Math.round(root.typeSize * 0.9)
+                  horizontalPadding: Math.round(Style.spacing.controlPaddingX * 0.6)
+                  verticalPadding: 0
+                  foreground: root.foreground
+                  selected: root.angleMode === "rad"
+                  focusable: true
+                  tooltipText: "Interpret trigonometric arguments in radians"
+                  Accessible.name: "Radians"
+                  onClicked: {
+                    root.angleMode = "rad"
+                    root.status = ""
+                    input.forceActiveFocus()
+                  }
+                }
+              }
+            }
           }
 
           Rectangle {
@@ -1011,7 +1084,11 @@ Item {
                     },
                     {
                       title: "Functions and notation",
-                      body: "<p><b>Square root / Absolute value</b><br><i>sqrt(16) or √16 / abs(-7)</i></p>" + "<p><b>Rounding</b><br><i>round(2.5), round(3.14159; 2)</i></p>" + "<p><b>Round down / Round up</b><br><i>floor(2.9) / ceil(2.1)</i></p>" + "<p><b>Constants</b><br><i>pi, π, e</i></p>" + "<p><b>Decimals / Thousands</b><br><i>0.5 or 0,5 / 1'000</i></p>"
+                      body: "<p><b>Square root / Absolute value</b><br><i>sqrt(16) or √16 / abs(-7)</i></p>" + "<p><b>Logarithms</b><br><i>log(1000)</i> is base 10, <i>ln(e)</i> is natural.</p>" + "<p><b>Rounding</b><br><i>round(2.5), round(3.14159; 2)</i></p>" + "<p><b>Round down / Round up</b><br><i>floor(2.9) / ceil(2.1)</i></p>" + "<p><b>Constants</b><br><i>pi, π, e</i></p>" + "<p><b>Decimals / Thousands</b><br><i>0.5 or 0,5 / 1'000</i></p>"
+                    },
+                    {
+                      title: "Angles and trigonometry",
+                      body: "<p><b>Functions</b><br><i>sin, cos, tan, sec, csc, cot</i>, for example <i>sin(30), cot(45)</i>.</p>" + "<p>Switch <b>Deg</b> / <b>Rad</b> above the expression field. Degrees are the default. Values at a pole, such as <i>tan(90)</i> in degrees, have no result.</p>"
                     }
                   ]
 
