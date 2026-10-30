@@ -16,12 +16,52 @@
 // Locale habits are normalised: ' as a thousands separator (1'000), a decimal
 // comma (0,5), and the typographic × ÷ − − π √ characters.
 
+// Trigonometric functions take the angle mode as their second argument so the
+// evaluator stays reentrant: "deg" converts to radians, "rad" is left as is.
+function toRadians(value, mode) {
+	return mode === "rad" ? value : value * Math.PI / 180
+}
+
+// tan, sec, csc, and cot are undefined at their poles. Math.cos(π/2) is only
+// near zero in floating point, so treat a near-zero denominator as a pole.
+function atPole(value) {
+	return Math.abs(value) < 1e-12
+}
+
 let FUNCTIONS = {
 	sqrt: { min: 1, max: 1, apply: function (a) { return Math.sqrt(a) } },
 	abs: { min: 1, max: 1, apply: function (a) { return Math.abs(a) } },
 	round: { min: 1, max: 2, apply: function (a) { return roundTo(a[0], a.length > 1 ? a[1] : 0) } },
 	floor: { min: 1, max: 1, apply: function (a) { return Math.floor(a[0]) } },
-	ceil: { min: 1, max: 1, apply: function (a) { return Math.ceil(a[0]) } }
+	ceil: { min: 1, max: 1, apply: function (a) { return Math.ceil(a[0]) } },
+	ln: { min: 1, max: 1, apply: function (a) { return Math.log(a[0]) } },
+	log: { min: 1, max: 1, apply: function (a) { return Math.log(a[0]) / Math.LN10 } },
+	sin: { min: 1, max: 1, apply: function (a, mode) { return Math.sin(toRadians(a[0], mode)) } },
+	cos: { min: 1, max: 1, apply: function (a, mode) { return Math.cos(toRadians(a[0], mode)) } },
+	tan: {
+		min: 1, max: 1, apply: function (a, mode) {
+			let cos = Math.cos(toRadians(a[0], mode))
+			return atPole(cos) ? Infinity : Math.sin(toRadians(a[0], mode)) / cos
+		}
+	},
+	sec: {
+		min: 1, max: 1, apply: function (a, mode) {
+			let cos = Math.cos(toRadians(a[0], mode))
+			return atPole(cos) ? Infinity : 1 / cos
+		}
+	},
+	csc: {
+		min: 1, max: 1, apply: function (a, mode) {
+			let sin = Math.sin(toRadians(a[0], mode))
+			return atPole(sin) ? Infinity : 1 / sin
+		}
+	},
+	cot: {
+		min: 1, max: 1, apply: function (a, mode) {
+			let sin = Math.sin(toRadians(a[0], mode))
+			return atPole(sin) ? Infinity : Math.cos(toRadians(a[0], mode)) / sin
+		}
+	}
 }
 
 const CONSTANTS = {
@@ -105,7 +145,7 @@ function tokenize(text) {
 	return tokens
 }
 
-function parse(tokens) {
+function parse(tokens, mode) {
 	let pos = 0
 
 	function peek(offset) { return tokens[pos + (offset || 0)] }
@@ -206,7 +246,7 @@ function parse(tokens) {
 			while (accept(";")) args.push(expression().value)
 			if (!is(take(), ")")) fail()
 			if (args.length < fn.min || args.length > fn.max) fail()
-			return { value: fn.apply(args), percent: null }
+			return { value: fn.apply(args, mode), percent: null }
 		}
 		fail()
 	}
@@ -229,13 +269,15 @@ function format(value) {
 
 // Result as a plain string, or null when the input is not a complete
 // calculation. A lone number is not a calculation, so it gets no result.
-function evaluate(expression) {
+// The angle mode ("deg" or "rad") only affects trigonometric functions and
+// defaults to degrees, matching the calculator's initial setting.
+function evaluate(expression, angleMode) {
 	let text = normalize(expression)
 	if (!text || /^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(text)) return null
 	let tokens = tokenize(text)
 	if (!tokens || tokens.length === 0) return null
 	try {
-		return format(parse(tokens))
+		return format(parse(tokens, angleMode === "rad" ? "rad" : "deg"))
 	} catch (e) {
 		return null
 	}
