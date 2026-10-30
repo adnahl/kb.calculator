@@ -59,7 +59,14 @@ reload the configuration with `hyprctl reload`.
 
 Type an expression such as `(128 + 64) / 2`. Results update live.
 Supported notation includes powers, parentheses, percentages, implicit
-multiplication, `sqrt`, `abs`, `round`, `floor`, `ceil`, `pi`, and `e`.
+multiplication, `sqrt`, `abs`, `round`, `floor`, `ceil`, `log` (base 10),
+`ln` (natural), `sin`, `cos`, `tan`, `sec`, `csc`, `cot`, `pi`, and `e`.
+
+Trigonometric functions follow the **Deg** / **Rad** toggle above the
+expression field; degrees are the default. Select the mode to recalculate
+the current expression. `log` is base 10 and `ln` is natural. Values at a
+pole, such as `tan(90)` in degrees, have no result.
+
 The **Help** button contains the full notation reference.
 
 - **Enter:** copy the result and close.
